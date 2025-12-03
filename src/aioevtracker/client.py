@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import logging
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import TYPE_CHECKING, Any
 
 import aiohttp
@@ -45,9 +45,9 @@ def _format_datetime_for_api(dt: datetime | str | None) -> str | None:
 
     # Convert to UTC and format with Z suffix
     if dt.tzinfo is None:
-        dt = dt.astimezone(timezone.utc)
+        dt = dt.astimezone(UTC)
     else:
-        dt = dt.astimezone(timezone.utc)
+        dt = dt.astimezone(UTC)
 
     return dt.strftime("%Y-%m-%dT%H:%M:%SZ")
 
@@ -89,7 +89,7 @@ class EVTrackerClient:
         if self._owned_session and self._session and not self._session.closed:
             await self._session.close()
 
-    async def __aenter__(self) -> "EVTrackerClient":
+    async def __aenter__(self) -> EVTrackerClient:
         """Async context manager entry."""
         return self
 
@@ -133,7 +133,7 @@ class EVTrackerClient:
 
                 if response.status == 403:
                     raise EVTrackerAuthenticationError(
-                        "API key lacks required permissions or PRO subscription required"
+                        "API key lacks permissions or PRO subscription required"
                     )
 
                 if response.status == 429:
