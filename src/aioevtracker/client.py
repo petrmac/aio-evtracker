@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import logging
 from datetime import UTC, datetime
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, cast
 
 import aiohttp
 
@@ -158,7 +158,7 @@ class EVTrackerClient:
                         f"API error: {response.status} - {error_msg}"
                     )
 
-                return await response.json()
+                return cast(dict[str, Any], await response.json())
 
         except aiohttp.ClientError as err:
             _LOGGER.error("Connection error: %s", err)
@@ -180,7 +180,7 @@ class EVTrackerClient:
             List of car dictionaries.
         """
         response = await self._request("GET", ENDPOINT_CARS)
-        return response.get("data", [])
+        return cast(list[dict[str, Any]], response.get("data", []))
 
     async def get_default_car(self) -> Car | None:
         """Get user's default car.
@@ -208,7 +208,7 @@ class EVTrackerClient:
             State dictionary.
         """
         response = await self._request("GET", ENDPOINT_HA_STATE)
-        return response.get("data", {})
+        return cast(dict[str, Any], response.get("data", {}))
 
     async def log_session(
         self,
